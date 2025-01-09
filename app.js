@@ -24,7 +24,7 @@ app.use('/api/users', userRoutes);
 
 // Fallback route to serve the home.html for any other requests
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 
