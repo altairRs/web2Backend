@@ -86,6 +86,95 @@
         a {
             text-decoration: none;
         }
+<<<<<<< HEAD
+=======
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .board {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .column {
+            width: 30%;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .task {
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: grab;
+        }
+
+        .task-label {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .task[data-category="UI Design"] .task-label {
+            background-color: #007bff;
+        }
+
+        .task[data-category="Illustration"] .task-label {
+            background-color: #28a745;
+        }
+
+        .task[data-category="Copywriting"] .task-label {
+            background-color: #ffc107;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        .progress {
+            height: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            margin-top: 10px;
+        }
+>>>>>>> origin/altrhomepagev2
     </style>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
@@ -123,5 +212,219 @@
             calendar.render();
         });
     </script>
+<<<<<<< HEAD
+=======
+
+<div class="container-fluid">
+    <h1 class="text-center my-4">Homepage Design</h1>
+    <div class="d-flex justify-content-between">
+        <div class="board">
+            <div class="column" data-status="Task Ready">
+                <h4>Task Ready</h4>
+                <div class="task" draggable="true" data-category="Copywriting">
+                    <span class="task-label">Copywriting</span>
+                    <p>Check the company we copied doesn’t think we copied them.</p>
+                </div>
+                <div class="task" draggable="true" data-category="Illustration">
+                    <span class="task-label">Illustration</span>
+                    <p>Send Advert illustrations over to the production company.</p>
+                </div>
+            </div>
+            <div class="column" data-status="In Progress">
+                <h4>In Progress</h4>
+                <div class="task" draggable="true" data-category="UI Design">
+                    <span class="task-label">UI Design</span>
+                    <p>Replace lorem ipsum text in the final designs.</p>
+                </div>
+            </div>
+            <div class="column" data-status="Done">
+                <h4>Done</h4>
+                <div class="task" draggable="true" data-category="Copywriting">
+                    <span class="task-label">Copywriting</span>
+                    <p>Konsep hero title yang menarik.</p>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar">
+            <h4>Task Progress</h4>
+            <div class="mb-3">
+                <span>Copywriting</span>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <span>Illustration</span>
+                <div class="progress">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <span>UI Design</span>
+                <div class="progress">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <span>Overall Progress</span>
+                <div class="progress">
+                    <div class="progress-bar bg-info" id="overall-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="addTaskButton" class="btn btn-success m-3">Add Task</button>
+
+<div class="modal" id="taskModal">
+    <div class="modal-header">
+        <h5>Edit Task</h5>
+        <button id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="taskTitle">Task Title</label>
+            <input type="text" id="taskTitle" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="taskCategory">Category</label>
+            <select id="taskCategory" class="form-control">
+                <option value="Copywriting">Copywriting</option>
+                <option value="Illustration">Illustration</option>
+                <option value="UI Design">UI Design</option>
+            </select>
+        </div>
+        <button id="saveTask" class="btn btn-primary">Save</button>
+    </div>
+</div>
+
+<script>
+    const tasks = document.querySelectorAll('.task');
+    const columns = document.querySelectorAll('.column');
+    const taskModal = document.getElementById('taskModal');
+    const taskTitleInput = document.getElementById('taskTitle');
+    const taskCategorySelect = document.getElementById('taskCategory');
+    const saveTaskButton = document.getElementById('saveTask');
+    const closeModalButton = document.getElementById('closeModal');
+    const addTaskButton = document.getElementById('addTaskButton');
+    let currentTask;
+
+    tasks.forEach(task => {
+        task.addEventListener('dragstart', () => {
+            task.classList.add('dragging');
+        });
+
+        task.addEventListener('dragend', () => {
+            task.classList.remove('dragging');
+            updateProgress();
+        });
+
+        task.addEventListener('dblclick', () => {
+            openTaskModal(task);
+        });
+    });
+
+    columns.forEach(column => {
+        column.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(column, e.clientY);
+            const draggingTask = document.querySelector('.dragging');
+            if (afterElement == null) {
+                column.appendChild(draggingTask);
+            } else {
+                column.insertBefore(draggingTask, afterElement);
+            }
+        });
+    });
+
+    addTaskButton.addEventListener('click', () => {
+        openTaskModal();
+    });
+
+    function getDragAfterElement(column, y) {
+        const draggableElements = [...column.querySelectorAll('.task:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function openTaskModal(task = null) {
+        currentTask = task;
+        if (task) {
+            taskTitleInput.value = task.querySelector('p').innerText;
+            taskCategorySelect.value = task.dataset.category;
+        } else {
+            taskTitleInput.value = '';
+            taskCategorySelect.value = 'Copywriting';
+        }
+        taskModal.classList.add('show');
+    }
+
+    closeModalButton.addEventListener('click', () => {
+        taskModal.classList.remove('show');
+    });
+
+    saveTaskButton.addEventListener('click', () => {
+        if (currentTask) {
+            currentTask.querySelector('p').innerText = taskTitleInput.value;
+            currentTask.dataset.category = taskCategorySelect.value;
+            currentTask.querySelector('.task-label').innerText = taskCategorySelect.value;
+            currentTask.querySelector('.task-label').style.backgroundColor = getCategoryColor(taskCategorySelect.value);
+        } else {
+            const newTask = document.createElement('div');
+            newTask.classList.add('task');
+            newTask.draggable = true;
+            newTask.dataset.category = taskCategorySelect.value;
+            newTask.innerHTML = `
+                <span class="task-label">${taskCategorySelect.value}</span>
+                <p>${taskTitleInput.value}</p>
+            `;
+            newTask.addEventListener('dragstart', () => {
+                newTask.classList.add('dragging');
+            });
+            newTask.addEventListener('dragend', () => {
+                newTask.classList.remove('dragging');
+                updateProgress();
+            });
+            newTask.addEventListener('dblclick', () => {
+                openTaskModal(newTask);
+            });
+            document.querySelector('[data-status="Task Ready"]').appendChild(newTask);
+            tasks.push(newTask);
+        }
+        taskModal.classList.remove('show');
+        updateProgress();
+    });
+
+    function getCategoryColor(category) {
+        switch (category) {
+            case 'UI Design':
+                return '#007bff';
+            case 'Illustration':
+                return '#28a745';
+            case 'Copywriting':
+                return '#ffc107';
+        }
+    }
+
+    function updateProgress() {
+        const totalTasks = tasks.length;
+        const doneTasks = document.querySelector('[data-status="Done"]').childElementCount;
+        const progressPercentage = (doneTasks / totalTasks) * 100;
+        document.getElementById('overall-progress').style.width = progressPercentage + '%';
+        document.getElementById('overall-progress').setAttribute('aria-valuenow', progressPercentage);
+    }
+
+    updateProgress();
+</script>
+>>>>>>> origin/altrhomepagev2
 </body>
 </html>
