@@ -1,164 +1,527 @@
-
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    
-       
-        
-        
-    
-        <title>Pomodoro Tracker — Удобное приложение для управления временем на основе «Техники Pomodoro»</title>
-        
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="main.1b5c6cd76329c887fdc9.css">
-    
-    
-        <script src="https://pagead2.googlesyndication.com/pagead/managed/js/adsense/m202412090101/show_ads_impl_fy2021.js"></script><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" type="text/javascript"></script>
-        
-    </head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.board {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    width: 100%;
+}
+
+.column {
+    width: 30%;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-progress-container {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    width: 250px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+/* Toggle button for task progress */
+.toggle-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+#toggle-pomodoro-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;        
+}
+
+/* Toggle button for task container */
+#task-progress .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#task-progress .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#task-progress .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
+
+/* Toggle button for Pomodoro container */
+#pomodoro-container .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#pomodoro-container .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#pomodoro-container .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
+
+
+
+
+.hidden {
+    transform: translateX(100%);
+}
+
+.task {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab;
+}
+
+.task-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+}
+
+.task[data-category="UI Design"] .task-label {
+    background-color: #007bff;
+}
+
+.task[data-category="Illustration"] .task-label {
+    background-color: #28a745;
+}
+
+.task[data-category="Copywriting"] .task-label {
+    background-color: #ffc107;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress {
+    height: 20px;
+}
+
+.modal-body {
+    margin-top: 10px;
+}
+
+.pomodoro-container {
+    position: fixed;
+    top: 420px;
+    right: 20px;
+    width: 250px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.pomodoro-container #timer {
+    font-size: 30px;
+    text-align: center;
+    margin: 5px 0;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #000;
+}
+
+.pomodoro-container button {
+    height: 40px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.4s ease;
+}
+
+.pomodoro-container button:active {
+    transform: scale(0.98);
+}
+
+.pomodoro-container .start {
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .start:hover {
+    background: linear-gradient(135deg, #185a9d, #43cea2);
+}
+
+.pomodoro-container .stop {
+    background: linear-gradient(135deg, #fc466b, #3f5efb);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .stop:hover {
+    background: linear-gradient(135deg, #3f5efb, #fc466b);
+}
+
+.pomodoro-container .reset {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .reset:hover {
+    background: linear-gradient(135deg, #ffd200, #f7971e);
+}
+
+
+
+    </style>
+</head>
+
 <body>
-    
-
-
-    <link rel="icon" id="fav-svg" type="image/png" href="/static/images/yellow@2x.png?b201a9558db58cc596577abbc5c8042f">
-    <link rel="alternate icon" id="fav-png" type="image/png" href="/static/images/yellow@2x.png?b201a9558db58cc596577abbc5c8042f">
-    
-    <link rel="manifest" href="/manifest.json">
-    
-    <title>Pomodoro Tracker — Удобное приложение для управления временем на основе «Техники Pomodoro»</title>
-    
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="main.1b5c6cd76329c887fdc9.css">
-    
-    <!-- FullCalendar CSS -->
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
-    
-    <script src="https://pagead2.googlesyndication.com/pagead/managed/js/adsense/m202412090101/show_ads_impl_fy2021.js"></script>
-    <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" type="text/javascript"></script>
-    
-    <!-- FullCalendar JS -->
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
-    
-    </head>
-    <body>
-
-        <link rel="icon" id="fav-svg" type="image/png" href="/static/images/yellow@2x.png?b201a9558db58cc596577abbc5c8042f">
-        <link rel="alternate icon" id="fav-png" type="image/png" href="/static/images/yellow@2x.png?b201a9558db58cc596577abbc5c8042f">
-        <link rel="manifest" href="/manifest.json">
+    <div class="container-fluid">
+        <h1 class="my-4 d-flex justify-content-between align-items-center">
+            <span style="flex-grow: 1; text-align: center;">Homepage Design</span>
+            <a href="profile.html">
+                <button style="font-size: 16px; background-color: white; border: 1px solid #ccc; color: #333; outline: none; 
+                              padding: 12px; border-radius: 50%; transition: transform 0.3s ease; width: 50px; height: 50px;
+                              margin-left: -5px;" 
+                        onmouseover="this.style.transform='scale(1.1)'" 
+                        onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-user" style="font-size: 24px;"></i> <!-- Profile icon -->
+                </button>
+            </a>
+        </h1>
         
-        <div id="pomodoro-timer">
-            <h1>Pomodoro Timer</h1>
-            <div id="timer">
-                <span id="minutes">25</span>:<span id="seconds">00</span>
-            </div>
-            <button id="start-timer">Start</button>
-            <button id="reset-timer">Reset</button>
-        </div>
-    
-        <script>
-            let timer;
-            let isRunning = false;
-            let timeLeft = 25 * 60;
-    
-            const startButton = document.getElementById('start-timer');
-            const resetButton = document.getElementById('reset-timer');
-            const minutesSpan = document.getElementById('minutes');
-            const secondsSpan = document.getElementById('seconds');
-    
-            function updateTimer() {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                minutesSpan.textContent = minutes.toString().padStart(2, '0');
-                secondsSpan.textContent = seconds.toString().padStart(2, '0');
-            }
-    
-            function startTimer() {
-                if (isRunning) return;
-                isRunning = true;
-                timer = setInterval(() => {
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        isRunning = false;
-                        alert('Time is up!');
-                    } else {
-                        timeLeft--;
-                        updateTimer();
-                    }
-                }, 1000);
-            }
-    
-            function resetTimer() {
-                clearInterval(timer);
-                isRunning = false;
-                timeLeft = 25 * 60;
-                updateTimer();
-            }
-    
-            startButton.addEventListener('click', startTimer);
-            resetButton.addEventListener('click', resetTimer);
-
-updateTimer();
-        </script>
-
-    
-    
-    <pomodoro-todo>
-        <h4 class="c-header u-mt4"> Запланировано </h4>
-        <pomo-create>
-            <form class="c-pomo u-noborder">
-                <div class="c-pomo__cat" title="Категория <Enter>">
-                    <input class="c-input" data-test="pomo-category" ref="category" placeholder="Категория" aria-label="категория">
-                </div>
-                <div class="c-pomo__desc">
-                    <div class="o-input-group u-flex1">
-                        <input class="c-input" data-test="pomo-description" ref="description" placeholder="Короткое описание" title="Короткое описание - [#category] description [::amount]">
-                        <button class="c-btn c-pomo__ctrl" data-test="pomo-append" type="submit" title="Добавить <Enter>">
-                            <i class="fas fa-plus"></i>
-                        </button>
+        <div class="d-flex">
+            <div class="board">
+                <div class="column" data-status="Task Ready">
+                    <h4>Task Ready</h4>
+                    <div class="task" draggable="true" data-category="Copywriting">
+                        <span class="task-label">Copywriting</span>
+                        <p>Check the company we copied doesn’t think we copied them.</p>
                     </div>
-                    <button class="c-btn c-pomo__ctrl u-ml2" data-test="scheduler" title="Планировщик">
-                        <i class="fa-clipboard-list fa"></i>
-                    </button>
+                    <div class="task" draggable="true" data-category="Illustration">
+                        <span class="task-label">Illustration</span>
+                        <p>Send Advert illustrations over to the production company.</p>
+                    </div>
                 </div>
-            </form>
-        </pomo-create>
-        <div class="c-note c-note--blue">
-            <h4 class="u-size-l u-bold u-mb2">
-                <i class="fas fa-clipboard"></i> Список планирования пуст.
-            </h4>
-            <p>Попробуйте добавить задачи используя форму выше.</p>
+                <div class="column" data-status="In Progress">
+                    <h4>In Progress</h4>
+                    <div class="task" draggable="true" data-category="UI Design">
+                        <span class="task-label">UI Design</span>
+                        <p>Replace lorem ipsum text in the final designs.</p>
+                    </div>
+                </div>
+                <div class="column" data-status="Done">
+                    <h4>Done</h4>
+                    <div class="task" draggable="true" data-category="Copywriting">
+                        <span class="task-label">Copywriting</span>
+                        <p>Konsep hero title yang menarik.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="task-progress-container" id="task-progress">
+                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">⇨</button>
+                <h4>Task Progress</h4>
+                <div class="mb-3">
+                    <span>Copywriting</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>Illustration</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>UI Design</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>Overall Progress</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" id="overall-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pomodoro-container" id="pomodoro-container">
+                <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">⇨</button>
+                <h4>Pomodoro Timer</h4>
+                <div id="timer">25:00</div>
+                <button class="start" onclick="startTimer()">Start</button>
+                <button class="stop" onclick="stopTimer()">Stop</button>
+                <button class="reset" onclick="resetTimer()">Reset</button>
+            </div>
         </div>
-        <div ref="sortable" data-test="todo-list" data-source="todo" class="u-flex--column u-flex"></div>
-        <h7 class="c-header u-mv3"></h7>
-        <div class="u-flex u-flex--align-start u-mt3">
-            <div></div>
-            <button ref="configure" data-test="configure-todo" title="Настроить" class="c-btn u-ph2 u-mla">
-                <i class="fas fa-cog u-mr3"></i>
-                <i class="fas fa-angle-down c-btn_arrow"></i>
-            </button>
-        </div>
-    </pomodoro-todo>
-    
-    <!-- Calendar Container -->
-    <div id='calendar'></div>
-    
-    <!-- Initialize Calendar -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth'
-            });
-            calendar.render();
-        });
-    </script>
-    
-    </body>
-    </html>
+    </div>
 
-    
+    <button id="addTaskButton" class="btn btn-success m-3">Add Task</button>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-header">
+            <h5>Edit Task</h5>
+            <button id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="taskTitle">Task Title</label>
+                <input type="text" id="taskTitle" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="taskCategory">Category</label>
+                <select id="taskCategory" class="form-control">
+                    <option value="Copywriting">Copywriting</option>
+                    <option value="Illustration">Illustration</option>
+                    <option value="UI Design">UI Design</option>
+                </select>
+            </div>
+            <button id="saveTask" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let totalSeconds = 25 * 60;
+        let remainingSeconds = totalSeconds;
+        
+        document.getElementById('toggle-progress-btn').addEventListener('click', function () {
+            const progressContainer = document.getElementById('task-progress');
+            progressContainer.classList.toggle('hidden');
+        });
+
+        document.getElementById('toggle-pomodoro-btn').addEventListener('click', function () {
+            const pomodoroContainer = document.getElementById('pomodoro-container');
+            pomodoroContainer.classList.toggle('hidden');
+        });
+
+
+        function updateDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    alert("Time's up! Take a break.");
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            stopTimer();
+            remainingSeconds = totalSeconds;
+            updateDisplay();
+        }
+
+        updateDisplay();
+
+        const tasks = document.querySelectorAll('.task');
+        const columns = document.querySelectorAll('.column');
+        const taskModal = document.getElementById('taskModal');
+        const taskTitleInput = document.getElementById('taskTitle');
+        const taskCategorySelect = document.getElementById('taskCategory');
+        const saveTaskButton = document.getElementById('saveTask');
+        const closeModalButton = document.getElementById('closeModal');
+        const addTaskButton = document.getElementById('addTaskButton');
+        let currentTask;
+
+        tasks.forEach(task => {
+            task.addEventListener('dragstart', () => {
+                task.classList.add('dragging');
+            });
+
+            task.addEventListener('dragend', () => {
+                task.classList.remove('dragging');
+                updateProgress();
+            });
+
+            task.addEventListener('dblclick', () => {
+                openTaskModal(task);
+            });
+        });
+
+        columns.forEach(column => {
+            column.addEventListener('dragover', e => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(column, e.clientY);
+                const draggingTask = document.querySelector('.dragging');
+                if (afterElement == null) {
+                    column.appendChild(draggingTask);
+                } else {
+                    column.insertBefore(draggingTask, afterElement);
+                }
+            });
+        });
+
+        addTaskButton.addEventListener('click', () => {
+            openTaskModal();
+        });
+
+        function getDragAfterElement(column, y) {
+            const draggableElements = [...column.querySelectorAll('.task:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function openTaskModal(task = null) {
+            currentTask = task;
+            if (task) {
+                taskTitleInput.value = task.querySelector('p').innerText;
+                taskCategorySelect.value = task.dataset.category;
+            } else {
+                taskTitleInput.value = '';
+                taskCategorySelect.value = 'Copywriting';
+            }
+            taskModal.classList.add('show');
+        }
+
+        closeModalButton.addEventListener('click', () => {
+            taskModal.classList.remove('show');
+        });
+
+        saveTaskButton.addEventListener('click', () => {
+            if (currentTask) {
+                currentTask.querySelector('p').innerText = taskTitleInput.value;
+                currentTask.dataset.category = taskCategorySelect.value;
+                currentTask.querySelector('.task-label').innerText = taskCategorySelect.value;
+                currentTask.querySelector('.task-label').style.backgroundColor = getCategoryColor(taskCategorySelect.value);
+            } else {
+                const newTask = document.createElement('div');
+                newTask.classList.add('task');
+                newTask.draggable = true;
+                newTask.dataset.category = taskCategorySelect.value;
+                newTask.innerHTML = `
+                    <span class="task-label">${taskCategorySelect.value}</span>
+                    <p>${taskTitleInput.value}</p>
+                `;
+                newTask.addEventListener('dragstart', () => {
+                    newTask.classList.add('dragging');
+                });
+                newTask.addEventListener('dragend', () => {
+                    newTask.classList.remove('dragging');
+                    updateProgress();
+                });
+                newTask.addEventListener('dblclick', () => {
+                    openTaskModal(newTask);
+                });
+                document.querySelector('[data-status="Task Ready"]').appendChild(newTask);
+                tasks.push(newTask);
+            }
+            taskModal.classList.remove('show');
+            updateProgress();
+        });
+
+        function getCategoryColor(category) {
+            switch (category) {
+                case 'UI Design':
+                    return '#007bff';
+                case 'Illustration':
+                    return '#28a745';
+                case 'Copywriting':
+                    return '#ffc107';
+            }
+        }
+
+        function updateProgress() {
+            const totalTasks = document.querySelectorAll('.task').length;
+            const doneTasks = document.querySelector('[data-status="Done"]').childElementCount;
+            const progressPercentage = (doneTasks / totalTasks) * 100;
+            document.getElementById('overall-progress').style.width = progressPercentage + '%';
+            document.getElementById('overall-progress').setAttribute('aria-valuenow', progressPercentage);
+        }
+
+        updateProgress();
+    </script>
 </body>
+
 </html>
