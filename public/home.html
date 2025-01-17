@@ -208,34 +208,82 @@
     transform: scale(0.98);
 }
 
+@keyframes rotateGradientStart {
+    0% {
+        background: linear-gradient(135deg, #43cea2, #185a9d);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #43cea2, #185a9d);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
+}
+
 .pomodoro-container .start {
     background: linear-gradient(135deg, #43cea2, #185a9d);
+    background-size: 200% 200%;
     color: #fff;
     width: 100%;
+    transition: background-position 0.2s linear;
 }
 
 .pomodoro-container .start:hover {
-    background: linear-gradient(135deg, #185a9d, #43cea2);
+    animation: rotateGradientStart 0.5s linear forwards;
+}
+
+@keyframes rotateGradientStop {
+    0% {
+        background: linear-gradient(135deg, #fc466b, #3f5efb);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #fc466b, #3f5efb);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
 }
 
 .pomodoro-container .stop {
     background: linear-gradient(135deg, #fc466b, #3f5efb);
+    background-size: 200% 200%;
     color: #fff;
     width: 100%;
+    transition: background-position 0.2s linear;
 }
 
 .pomodoro-container .stop:hover {
-    background: linear-gradient(135deg, #3f5efb, #fc466b);
+    animation: rotateGradientStop 0.5s linear forwards;
+}
+
+@keyframes rotateGradientReset {
+    0% {
+        background: linear-gradient(135deg, #f7971e, #ffd200);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #f7971e, #ffd200);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
 }
 
 .pomodoro-container .reset {
     background: linear-gradient(135deg, #f7971e, #ffd200);
+    background-size: 200% 200%;
     color: #fff;
     width: 100%;
+    transition: background-position 0.2s linear;
 }
 
 .pomodoro-container .reset:hover {
-    background: linear-gradient(135deg, #ffd200, #f7971e);
+    animation: rotateGradientReset 0.5s linear forwards;
 }
 
 
