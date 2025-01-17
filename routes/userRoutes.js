@@ -2,7 +2,7 @@ const express = require("express");
 
 
 
-const { registerUser, loginUser, getUser } = require('../controllers/userControllers.js');
+const { registerUser, loginUser, getUser, resetPassword } = require('../controllers/userControllers.js');
 
 const router = express.Router();
 
@@ -13,6 +13,7 @@ router.post('/register', registerUser);
 // Route to login a user
 router.post('/login', loginUser);
 
+router.post('/reset-password', resetPassword);
 
 
 

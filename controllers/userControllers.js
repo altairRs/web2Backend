@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const mongoose = require('mongoose');
 
-
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -29,8 +28,6 @@ const registerUser = async (req, res) => {
         res.status(500).json({ message: 'Error registering user', error });
     }
 };
-
-
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -67,5 +64,24 @@ const loginUser = async (req, res) => {
         }
 };
 
+const resetPassword = async (req, res) => {
+    const { email, newPassword } = req.body;
 
-module.exports = { registerUser, loginUser };
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successfully', redirect: '/login.html' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ message: 'Error resetting password', error });
+    }
+};
+
+module.exports = { registerUser, loginUser, resetPassword };
