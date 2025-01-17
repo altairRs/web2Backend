@@ -517,7 +517,6 @@
             const totalTasks = document.querySelectorAll('.task').length;
             const doneTasks = document.querySelectorAll('[data-status="Done"] .task').length;
             const overallProgressPercentage = totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
-            console.log(`Overall: ${overallProgressPercentage}`);
 
             // Calculate and update progress for each category
             const categories = document.querySelectorAll('.task-progress-container .mb-3');
