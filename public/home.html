@@ -6,166 +6,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Management</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
-        }
+    background-color: #f8f9fa;
+    position: relative;
+}
 
-        .board {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
+.board {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    width: 100%;
+}
 
-        .column {
-            width: 30%;
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+.column {
+    width: 30%;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        .task {
-            background: #e9ecef;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: grab;
-        }
+.task-progress-container {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    width: 250px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
 
-        .task-label {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: white;
-        }
+/* Toggle button for task progress */
+.toggle-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
 
-        .task[data-category="UI Design"] .task-label {
-            background-color: #007bff;
-        }
+#toggle-pomodoro-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;        
+}
 
-        .task[data-category="Illustration"] .task-label {
-            background-color: #28a745;
-        }
+/* Toggle button for task container */
+#task-progress .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
 
-        .task[data-category="Copywriting"] .task-label {
-            background-color: #ffc107;
-        }
+#task-progress .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
 
-        .sidebar {
-            width: 250px;
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 20px;
-            right: 20px;
-        }
+#task-progress .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
 
-        .progress {
-            height: 20px;
-        }
+/* Toggle button for Pomodoro container */
+#pomodoro-container .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
+#pomodoro-container .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
 
-        .modal.show {
-            display: block;
-        }
+#pomodoro-container .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
 
-        .modal-body {
-            margin-top: 10px;
-        }
 
-        .pomodoro-container {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
 
-        .pomodoro-container h1 {
-            font-size: 24px;
-            color: #000;
-            text-align: center;
-        }
+.hidden {
+    transform: translateX(100%);
+}
 
-        .pomodoro-container #timer {
-            font-size: 36px;
-            text-align: center;
-            margin: 20px 0;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #000;
-        }
+.task {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab;
+}
 
-        .pomodoro-container button {
-            width: 100%;
-            height: 50px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.4s ease;
-        }
+.task-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+}
 
-        .pomodoro-container button:active {
-            transform: scale(0.98);
-        }
+.task[data-category="UI Design"] .task-label {
+    background-color: #007bff;
+}
 
-        .pomodoro-container .start {
-            background: linear-gradient(135deg, #43cea2, #185a9d);
-            color: #fff;
-        }
+.task[data-category="Illustration"] .task-label {
+    background-color: #28a745;
+}
 
-        .pomodoro-container .start:hover {
-            background: linear-gradient(135deg, #185a9d, #43cea2);
-        }
+.task[data-category="Copywriting"] .task-label {
+    background-color: #ffc107;
+}
 
-        .pomodoro-container .stop {
-            background: linear-gradient(135deg, #fc466b, #3f5efb);
-            color: #fff;
-        }
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
 
-        .pomodoro-container .stop:hover {
-            background: linear-gradient(135deg, #3f5efb, #fc466b);
-        }
+.modal.show {
+    display: block;
+}
 
-        .pomodoro-container .reset {
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            color: #fff;
-        }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .pomodoro-container .reset:hover {
-            background: linear-gradient(135deg, #ffd200, #f7971e);
-        }
+.progress {
+    height: 20px;
+}
+
+.modal-body {
+    margin-top: 10px;
+}
+
+.pomodoro-container {
+    position: fixed;
+    top: 420px;
+    right: 20px;
+    width: 250px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.pomodoro-container #timer {
+    font-size: 30px;
+    text-align: center;
+    margin: 5px 0;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #000;
+}
+
+.pomodoro-container button {
+    height: 40px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.4s ease;
+}
+
+.pomodoro-container button:active {
+    transform: scale(0.98);
+}
+
+.pomodoro-container .start {
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .start:hover {
+    background: linear-gradient(135deg, #185a9d, #43cea2);
+}
+
+.pomodoro-container .stop {
+    background: linear-gradient(135deg, #fc466b, #3f5efb);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .stop:hover {
+    background: linear-gradient(135deg, #3f5efb, #fc466b);
+}
+
+.pomodoro-container .reset {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #fff;
+    width: 100%;
+}
+
+.pomodoro-container .reset:hover {
+    background: linear-gradient(135deg, #ffd200, #f7971e);
+}
+
+
+
     </style>
 </head>
 
 <body>
     <div class="container-fluid">
-        <h1 class="text-center my-4">Homepage Design</h1>
-        <div class="d-flex justify-content-between">
+        <h1 class="my-4 d-flex justify-content-between align-items-center">
+            <span style="flex-grow: 1; text-align: center;">Homepage Design</span>
+            <a href="profile.html">
+                <button style="font-size: 16px; background-color: white; border: 1px solid #ccc; color: #333; outline: none; 
+                              padding: 12px; border-radius: 50%; transition: transform 0.3s ease; width: 50px; height: 50px;
+                              margin-left: -5px;" 
+                        onmouseover="this.style.transform='scale(1.1)'" 
+                        onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-user" style="font-size: 24px;"></i> <!-- Profile icon -->
+                </button>
+            </a>
+        </h1>
+        
+        <div class="d-flex">
             <div class="board">
                 <div class="column" data-status="Task Ready">
                     <h4>Task Ready</h4>
@@ -193,7 +286,8 @@
                     </div>
                 </div>
             </div>
-            <div class="sidebar">
+            <div class="task-progress-container" id="task-progress">
+                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">⇨</button>
                 <h4>Task Progress</h4>
                 <div class="mb-3">
                     <span>Copywriting</span>
@@ -219,13 +313,14 @@
                         <div class="progress-bar bg-info" id="overall-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
-                <div class="pomodoro-container">
-                    <h1>Pomodoro Timer</h1>
-                    <div id="timer">25:00</div>
-                    <button class="start" onclick="startTimer()">Start</button>
-                    <button class="stop" onclick="stopTimer()">Stop</button>
-                    <button class="reset" onclick="resetTimer()">Reset</button>
-                </div>
+            </div>
+            <div class="pomodoro-container" id="pomodoro-container">
+                <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">⇨</button>
+                <h4>Pomodoro Timer</h4>
+                <div id="timer">25:00</div>
+                <button class="start" onclick="startTimer()">Start</button>
+                <button class="stop" onclick="stopTimer()">Stop</button>
+                <button class="reset" onclick="resetTimer()">Reset</button>
             </div>
         </div>
     </div>
@@ -258,6 +353,17 @@
         let timerInterval;
         let totalSeconds = 25 * 60;
         let remainingSeconds = totalSeconds;
+        
+        document.getElementById('toggle-progress-btn').addEventListener('click', function () {
+            const progressContainer = document.getElementById('task-progress');
+            progressContainer.classList.toggle('hidden');
+        });
+
+        document.getElementById('toggle-pomodoro-btn').addEventListener('click', function () {
+            const pomodoroContainer = document.getElementById('pomodoro-container');
+            pomodoroContainer.classList.toggle('hidden');
+        });
+
 
         function updateDisplay() {
             const minutes = Math.floor(remainingSeconds / 60);
