@@ -294,7 +294,7 @@
 <body>
     <div class="container-fluid">
         <h1 class="my-4 d-flex justify-content-between align-items-center">
-            <span style="flex-grow: 1; text-align: center;">Homepage Design</span>
+            <span style="flex-grow: 1; text-align: center; font-weight: bold;">Homepage Design</span>
             <a href="profile.html">
                 <button style="font-size: 16px; background-color: white; border: 1px solid #ccc; color: #333; outline: none; 
                               padding: 12px; border-radius: 50%; transition: transform 0.3s ease; width: 50px; height: 50px;
@@ -335,7 +335,9 @@
                 </div>
             </div>
             <div class="task-progress-container" id="task-progress">
-                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">⇨</button>
+                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">
+                    <i class="fa fa-tasks" style="color: white;"></i>
+                </button>
                 <h4>Task Progress</h4>
                 <div class="mb-3">
                     <span>Copywriting</span>
@@ -363,7 +365,9 @@
                 </div>
             </div>
             <div class="pomodoro-container" id="pomodoro-container">
-                <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">⇨</button>
+                <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">
+                    <i class="fa fa-clock" style="color: white;"></i>
+                </button>
                 <h4>Pomodoro Timer</h4>
                 <div id="timer">25:00</div>
                 <button class="start" onclick="startTimer()">Start</button>
