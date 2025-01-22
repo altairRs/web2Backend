@@ -20,11 +20,24 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6, // Minimum password length
   },
-  
   createdAt: {
     type: Date,
     default: Date.now, // Automatically sets the date when a user is created
   },
+  // Reference to tasks/cards created by the user
+  createdCards: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Card', // Reference to the Card model
+    },
+  ],
+  // Reference to tasks/cards assigned to the user
+  assignedCards: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Card', // Reference to the Card model
+    },
+  ],
 });
 
 // Create the User model
