@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -161,7 +160,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container-fluid">
         <h1 class="text-center my-4">Homepage Design</h1>
@@ -169,28 +167,12 @@
             <div class="board">
                 <div class="column" data-status="Task Ready">
                     <h4>Task Ready</h4>
-                    <div class="task" draggable="true" data-category="Copywriting">
-                        <span class="task-label">Copywriting</span>
-                        <p>Check the company we copied doesn’t think we copied them.</p>
-                    </div>
-                    <div class="task" draggable="true" data-category="Illustration">
-                        <span class="task-label">Illustration</span>
-                        <p>Send Advert illustrations over to the production company.</p>
-                    </div>
                 </div>
                 <div class="column" data-status="In Progress">
                     <h4>In Progress</h4>
-                    <div class="task" draggable="true" data-category="UI Design">
-                        <span class="task-label">UI Design</span>
-                        <p>Replace lorem ipsum text in the final designs.</p>
-                    </div>
                 </div>
                 <div class="column" data-status="Done">
                     <h4>Done</h4>
-                    <div class="task" draggable="true" data-category="Copywriting">
-                        <span class="task-label">Copywriting</span>
-                        <p>Konsep hero title yang menarik.</p>
-                    </div>
                 </div>
             </div>
             <div class="sidebar">
@@ -255,6 +237,7 @@
     </div>
 
     <script>
+        // Timer Logic
         let timerInterval;
         let totalSeconds = 25 * 60;
         let remainingSeconds = totalSeconds;
@@ -291,61 +274,19 @@
 
         updateDisplay();
 
-        const tasks = document.querySelectorAll('.task');
-        const columns = document.querySelectorAll('.column');
+        // Modal Logic
         const taskModal = document.getElementById('taskModal');
         const taskTitleInput = document.getElementById('taskTitle');
         const taskCategorySelect = document.getElementById('taskCategory');
         const saveTaskButton = document.getElementById('saveTask');
         const closeModalButton = document.getElementById('closeModal');
         const addTaskButton = document.getElementById('addTaskButton');
-        let currentTask;
 
-        tasks.forEach(task => {
-            task.addEventListener('dragstart', () => {
-                task.classList.add('dragging');
-            });
-
-            task.addEventListener('dragend', () => {
-                task.classList.remove('dragging');
-                updateProgress();
-            });
-
-            task.addEventListener('dblclick', () => {
-                openTaskModal(task);
-            });
-        });
-
-        columns.forEach(column => {
-            column.addEventListener('dragover', e => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(column, e.clientY);
-                const draggingTask = document.querySelector('.dragging');
-                if (afterElement == null) {
-                    column.appendChild(draggingTask);
-                } else {
-                    column.insertBefore(draggingTask, afterElement);
-                }
-            });
-        });
+        let currentTask = null;
 
         addTaskButton.addEventListener('click', () => {
             openTaskModal();
         });
-
-        function getDragAfterElement(column, y) {
-            const draggableElements = [...column.querySelectorAll('.task:not(.dragging)')];
-
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
 
         function openTaskModal(task = null) {
             currentTask = task;
@@ -363,36 +304,73 @@
             taskModal.classList.remove('show');
         });
 
-        saveTaskButton.addEventListener('click', () => {
-            if (currentTask) {
-                currentTask.querySelector('p').innerText = taskTitleInput.value;
-                currentTask.dataset.category = taskCategorySelect.value;
-                currentTask.querySelector('.task-label').innerText = taskCategorySelect.value;
-                currentTask.querySelector('.task-label').style.backgroundColor = getCategoryColor(taskCategorySelect.value);
-            } else {
-                const newTask = document.createElement('div');
-                newTask.classList.add('task');
-                newTask.draggable = true;
-                newTask.dataset.category = taskCategorySelect.value;
-                newTask.innerHTML = `
-                    <span class="task-label">${taskCategorySelect.value}</span>
-                    <p>${taskTitleInput.value}</p>
-                `;
-                newTask.addEventListener('dragstart', () => {
-                    newTask.classList.add('dragging');
+        // Show tasks
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch tasks from the backend
+                const response = await fetch('/api/tasks');
+                if (!response.ok) throw new Error('Failed to fetch tasks');
+                const tasks = await response.json();
+
+                // Render tasks in the appropriate columns
+                tasks.forEach((task) => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.classList.add('task');
+                    taskDiv.dataset.category = task.category;
+                    taskDiv.dataset.status = task.status;
+                    taskDiv.innerHTML = `
+                        <span class="task-label">${task.category}</span>
+                        <p>${task.title}</p>
+                    `;
+
+                    const column = document.querySelector(`[data-status="${task.status}"]`);
+                    if (column) column.appendChild(taskDiv);
                 });
-                newTask.addEventListener('dragend', () => {
-                    newTask.classList.remove('dragging');
-                    updateProgress();
-                });
-                newTask.addEventListener('dblclick', () => {
-                    openTaskModal(newTask);
-                });
-                document.querySelector('[data-status="Task Ready"]').appendChild(newTask);
-                tasks.push(newTask);
+            } catch (error) {
+                console.error('Error loading tasks:', error.message);
+                alert('Failed to load tasks. Please try again.');
             }
-            taskModal.classList.remove('show');
-            updateProgress();
+        });
+
+
+        // Save task
+        saveTaskButton.addEventListener('click', async () => {
+            const taskData = {
+                title: taskTitleInput.value,
+                category: taskCategorySelect.value,
+                status: 'Task Ready', // Default status for new tasks
+            };
+
+            try {
+                // Send task to the backend
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(taskData),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save task');
+                }
+
+                const newTask = await response.json();
+
+                // Add task to the UI
+                const taskDiv = document.createElement('div');
+                taskDiv.classList.add('task');
+                taskDiv.dataset.category = newTask.category;
+                taskDiv.innerHTML = `
+                    <span class="task-label">${newTask.category}</span>
+                    <p>${newTask.title}</p>
+                `;
+                document.querySelector(`[data-status="Task Ready"]`).appendChild(taskDiv);
+
+                // Close modal
+                taskModal.classList.remove('show');
+            } catch (error) {
+                console.error('Error:', error.message);
+                alert('Failed to add task. Please try again.');
+            }
         });
 
         function getCategoryColor(category) {
@@ -405,17 +383,6 @@
                     return '#ffc107';
             }
         }
-
-        function updateProgress() {
-            const totalTasks = document.querySelectorAll('.task').length;
-            const doneTasks = document.querySelector('[data-status="Done"]').childElementCount;
-            const progressPercentage = (doneTasks / totalTasks) * 100;
-            document.getElementById('overall-progress').style.width = progressPercentage + '%';
-            document.getElementById('overall-progress').setAttribute('aria-valuenow', progressPercentage);
-        }
-
-        updateProgress();
     </script>
 </body>
-
 </html>
