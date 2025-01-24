@@ -4,18 +4,20 @@ const User = require('./models/user.js'); // User schema/model
 const taskRoutes = require('./routes/taskRoutes'); // Import task routes
 const path = require('path');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 require('dotenv').config();
 
 
 const app = express();
 
 // Middleware
+app.use(bodyParser.json()); // Parses incoming JSON requests
+
+
+// Middleware
 app.use(express.json()); // Parses incoming JSON requests
 
 app.use('/api/tasks', taskRoutes); // Use task routes for the '/api/tasks' endpoint
-
-
-
 
 app.use(express.urlencoded({ extended: true }));
 

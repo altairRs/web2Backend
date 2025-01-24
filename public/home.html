@@ -17,7 +17,7 @@
         }
 
         .column {
-            width: 30%;
+            width: 35%;
             background: white;
             border-radius: 8px;
             padding: 15px;
@@ -165,13 +165,13 @@
         <h1 class="text-center my-4">Homepage Design</h1>
         <div class="d-flex justify-content-between">
             <div class="board">
-                <div class="column" data-status="Task Ready">
+                <div class="column" data-status="pending">
                     <h4>Task Ready</h4>
                 </div>
-                <div class="column" data-status="In Progress">
+                <div class="column" data-status="in-progress">
                     <h4>In Progress</h4>
                 </div>
-                <div class="column" data-status="Done">
+                <div class="column" data-status="completed">
                     <h4>Done</h4>
                 </div>
             </div>
@@ -326,19 +326,21 @@
                     const column = document.querySelector(`[data-status="${task.status}"]`);
                     if (column) column.appendChild(taskDiv);
                 });
+
+                // Update overall progress
+                updateOverallProgress(tasks);
             } catch (error) {
                 console.error('Error loading tasks:', error.message);
                 alert('Failed to load tasks. Please try again.');
             }
         });
 
-
         // Save task
         saveTaskButton.addEventListener('click', async () => {
             const taskData = {
                 title: taskTitleInput.value,
                 category: taskCategorySelect.value,
-                status: 'Task Ready', // Default status for new tasks
+                status: 'pending', // Default status for new tasks
             };
 
             try {
@@ -349,29 +351,53 @@
                     body: JSON.stringify(taskData),
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
+                    console.error('Server response:', data);
                     throw new Error('Failed to save task');
                 }
-
-                const newTask = await response.json();
 
                 // Add task to the UI
                 const taskDiv = document.createElement('div');
                 taskDiv.classList.add('task');
-                taskDiv.dataset.category = newTask.category;
+                taskDiv.dataset.category = data.category;
+                taskDiv.dataset.status = data.status;
                 taskDiv.innerHTML = `
-                    <span class="task-label">${newTask.category}</span>
-                    <p>${newTask.title}</p>
+                    <span class="task-label">${data.category}</span>
+                    <p>${data.title}</p>
                 `;
-                document.querySelector(`[data-status="Task Ready"]`).appendChild(taskDiv);
+                document.querySelector(`[data-status="pending"]`).appendChild(taskDiv);
 
                 // Close modal
                 taskModal.classList.remove('show');
+
+                // Update overall progress
+                const tasks = await fetchTasks();
+                updateOverallProgress(tasks);
             } catch (error) {
                 console.error('Error:', error.message);
                 alert('Failed to add task. Please try again.');
             }
         });
+
+        // Fetch tasks from the backend
+        async function fetchTasks() {
+            const response = await fetch('/api/tasks');
+            if (!response.ok) throw new Error('Failed to fetch tasks');
+            return await response.json();
+        }
+
+        // Update overall progress
+        function updateOverallProgress(tasks) {
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(task => task.status === 'completed').length;
+            const overallProgress = (completedTasks / totalTasks) * 100;
+
+            const overallProgressBar = document.getElementById('overall-progress');
+            overallProgressBar.style.width = `${overallProgress}%`;
+            overallProgressBar.setAttribute('aria-valuenow', overallProgress);
+        }
 
         function getCategoryColor(category) {
             switch (category) {
