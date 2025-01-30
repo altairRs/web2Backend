@@ -55,14 +55,23 @@ const loginUser = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        console.log('Login successful, token :', token);
+        console.log('Login successful, token:', token);
 
-        res.status(201).json({ message: 'Login successful', token , redirect: '/home.html'});
-        } catch (error) {
+        // Set the JWT token in an HTTP-only cookie
+        res.cookie("auth_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Ensures secure cookies in production
+            maxAge: 3600000 // 1 hour expiry
+        });
+
+        res.status(200).json({ message: 'Login successful', redirect: '/home.html' });
+
+    } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Error logging in', error });
-        }
+    }
 };
+
 
 const resetPassword = async (req, res) => {
     const { email, newPassword } = req.body;
@@ -84,4 +93,20 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, resetPassword };
+const updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+
+        await user.save();
+        res.json({ message: "Profile updated successfully", user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+module.exports = { registerUser, loginUser, resetPassword , updateUserProfile};

@@ -38,16 +38,25 @@ const updateTask = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: "Invalid task ID format" });
+  }
+
   try {
-    const updatedTask = await Task.findByIdAndUpdate(id, updates, { new: true });
-    if (!updatedTask) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-    res.status(200).json(updatedTask);
+      const updatedTask = await Task.findByIdAndUpdate(id, updates, { new: true });
+
+      if (!updatedTask) {
+          return res.status(404).json({ message: "Task not found" });
+      }
+
+      res.status(200).json(updatedTask);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating task', error });
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Error updating task", error });
   }
 };
+
+
 
 const deleteTask = async (req, res) => {
   const { id } = req.params;
@@ -63,4 +72,29 @@ const deleteTask = async (req, res) => {
   }
 };
 
-module.exports = { getAllTasks, createTask, updateTask, deleteTask };
+const saveAllTasks = async (req, res) => {
+  const { tasks } = req.body;
+  const userId = req.user.id; // Ensure user authentication
+
+  try {
+      const updatePromises = tasks.map(task =>
+          Task.findByIdAndUpdate(task.id, { status: task.status, savedBy: userId }, { new: true })
+      );
+
+      const updatedTasks = await Promise.all(updatePromises);
+      res.status(200).json({ message: 'Tasks updated successfully', updatedTasks });
+  } catch (error) {
+      console.error('Error saving tasks:', error);
+      res.status(500).json({ message: 'Error saving tasks', error });
+  }
+};
+
+exports.updateTask = (req, res) => {
+  // Update task logic here
+  res.send('Task updated');
+};
+
+
+
+module.exports = { getAllTasks, createTask, updateTask, deleteTask, saveAllTasks };
+

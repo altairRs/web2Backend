@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: "Segoe UI", sans-serif;
 }
 
 body {
@@ -10,7 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: whitesmoke;
+    background: linear-gradient(135deg, #3A1772, #9381FF);
 }
 
 .wrapper {
@@ -19,7 +19,7 @@ body {
     color: black;
     border-radius: 10px;
     padding: 30px 40px;
-    box-shadow: 30px 30px 30px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Adjusted shadow for better contrast */
 }
 
 .wrapper h1 {
@@ -56,11 +56,17 @@ body {
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
+    background: linear-gradient(135deg, #3A1772, #9381FF); /* Gradient for icons */
+    background-clip: text; /* Standard property */
+    -webkit-background-clip: text; /* Webkit-specific for Chrome, Safari, etc. */
+    -webkit-text-fill-color: transparent;
 }
+
+
 
 .wrapper .remember-forgot {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     font-size: 14.5px;
     margin: -15px 0 15px;
 }
@@ -82,16 +88,22 @@ body {
 .wrapper .btn {
     width: 100%;
     height: 45px;
-    background: black;
+    background: linear-gradient(135deg, #3A1772, #9381FF); /* Gradient background for the button */
     border: none;
     outline: none;
     border-radius: 40px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     font-size: 16px;
-    color: #fff;
+    color: #EDEDED;
     font-weight: 600;
+    transition: background 0.3s ease;
 }
+
+.wrapper .btn:hover {
+    background: linear-gradient(135deg, #9381FF, #3A1772); /* Reverse gradient on hover for an interactive effect */
+}
+
 
 .wrapper .register-link {
     font-size: 14.5px;

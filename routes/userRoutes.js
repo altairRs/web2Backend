@@ -1,4 +1,5 @@
 const express = require("express");
+const authMiddleware = require("../middleware/authMiddleware");
 
 
 
@@ -14,6 +15,16 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 router.post('/reset-password', resetPassword);
+
+router.get("/auth/check", authMiddleware, (req, res) => {
+    res.json({ authenticated: true, user: req.user });
+});
+
+router.post("/auth/logout", (req, res) => {
+    res.clearCookie("auth_token");
+    res.json({ message: "Logged out successfully", redirect: "/login.html" });
+});
+
 
 
 

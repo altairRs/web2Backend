@@ -24,3 +24,16 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         alert('An error occurred. Please try again.');
     }
 });
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const response = await fetch("/api/auth/check", { credentials: "include" });
+        const data = await response.json();
+
+        if (data.authenticated) {
+            window.location.href = "/home.html"; // Redirect to home if already logged in
+        }
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+    }
+});

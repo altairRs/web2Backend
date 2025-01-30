@@ -5,6 +5,9 @@ const taskRoutes = require('./routes/taskRoutes'); // Import task routes
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require("cookie-parser");
+const errorHandler = require("./middleware/errorMiddleware");
+const userRoutes = require('./routes/userRoutes');
 require('dotenv').config();
 
 
@@ -13,9 +16,13 @@ const app = express();
 // Middleware
 app.use(bodyParser.json()); // Parses incoming JSON requests
 
+// Error Handling Middleware
+app.use(errorHandler);
 
 // Middleware
+
 app.use(express.json()); // Parses incoming JSON requests
+app.use(cookieParser()); // Enable cookie parsing
 
 app.use('/api/tasks', taskRoutes); // Use task routes for the '/api/tasks' endpoint
 
@@ -25,8 +32,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Import and use routes
-const userRoutes = require('./routes/userRoutes');
+
 app.use('/api/users', userRoutes);
+app.use("/api", userRoutes);
 
 // Fallback route to serve the home.html for any other requests
 app.get('*', (req, res) => {
@@ -39,11 +47,6 @@ app.get('*', (req, res) => {
 connectDB();
 
 // Routes
-// Home route
-app.get('/', (req, res) => {
-  res.send('Welcome to the User Management API');
-});
-
 // Create a new user
 app.post('/api/users', async (req, res) => {
   try {
@@ -117,6 +120,14 @@ app.delete('/api/users/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
+// Home route
+app.get('/', (req, res) => {
+  res.send('Welcome to the User Management API');
+});
+
 
 // Start the server
 const PORT = 3000;
