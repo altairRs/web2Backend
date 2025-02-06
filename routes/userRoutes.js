@@ -1,6 +1,10 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
 const User = require('../models/user'); // Import the User model
+const bcrypt = require('bcrypt');
+const multer = require("multer");
+const path = require("path");  // Ensure path module is also imported
+
 
 
 const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA} = require('../controllers/userControllers.js');
@@ -46,7 +50,65 @@ router.get('/user', authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;
+// Update password
+router.put('/update-password', authMiddleware, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        
+        console.log("Password update request received:", req.user);
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Please provide both current and new passwords' });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password' });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        res.json({ message: 'Password updated successfully' });
+
+    } catch (error) {
+        console.error("Error updating password:", error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads/"); // Ensure 'uploads/' folder exists
+    },
+    filename: function (req, file, cb) {
+        cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
+
+const upload = multer({ storage });
+
+// Profile Picture Upload Route
+router.post("/update-profile-picture", upload.single("profilePicture"), async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.profilePicture = `/uploads/${req.file.filename}`;
+        await user.save();
+
+        res.json({ message: "Profile picture updated", imageUrl: user.profilePicture });
+    } catch (error) {
+        console.error("Error updating profile picture:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 
 

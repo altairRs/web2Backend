@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically sets the date when a user is created
   },
+
+  profilePicture: { 
+    type: String, 
+    default: "/uploads/default-profile.png" 
+  }
 });
 
 userSchema.pre('save', async function (next) {

@@ -121,6 +121,10 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+
 
 
 // Home route
