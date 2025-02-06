@@ -20,11 +20,28 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6, // Minimum password length
   },
+
+  // 2FA Fields
+  is2FAEnabled: {
+    type: Boolean,
+    default: false, // Default: 2FA is disabled unless the user enables it
+  },
+  securityAnswer: {
+    type: String,
+    required: function () { return this.is2FAEnabled; }, // Required only if 2FA is enabled
+  },
   
   createdAt: {
     type: Date,
     default: Date.now, // Automatically sets the date when a user is created
   },
+});
+
+userSchema.pre('save', async function (next) {
+  if (this.isModified('securityAnswer') && this.securityAnswer) {
+    this.securityAnswer = await bcrypt.hash(this.securityAnswer, 10);
+  }
+  next();
 });
 
 // Create the User model

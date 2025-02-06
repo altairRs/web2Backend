@@ -1,9 +1,10 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
+const User = require('../models/user'); // Import the User model
 
 
-
-const { registerUser, loginUser, getUser, resetPassword } = require('../controllers/userControllers.js');
+const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA} = require('../controllers/userControllers.js');
+const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
 
@@ -26,6 +27,26 @@ router.post("/auth/logout", (req, res) => {
 });
 
 
+router.post("/verify-2fa", verify2FA)
+
+router.get('/profile', authMiddleware, getUserProfile);
+
+router.post('/update-2fa', authMiddleware, updateTwoFA);
+
+router.get('/user', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password'); // Exclude password field
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+module.exports = router;
 
 
 

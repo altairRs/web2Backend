@@ -49,6 +49,15 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
 
+        // If the user has 2FA enabled, redirect to the 2FA verification page
+        if (user.is2FAEnabled) {
+            // Store user ID in session (or use a temporary token)
+            req.session.tempUserId = user._id; 
+
+            return res.status(200).json({ message: '2FA required', redirect: '/verify-2fa.html' });
+        }
+
+        // If no 2FA, log in directly
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
@@ -57,11 +66,10 @@ const loginUser = async (req, res) => {
 
         console.log('Login successful, token:', token);
 
-        // Set the JWT token in an HTTP-only cookie
         res.cookie("auth_token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Ensures secure cookies in production
-            maxAge: 3600000 // 1 hour expiry
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 3600000 // 1h expire
         });
 
         res.status(200).json({ message: 'Login successful', redirect: '/home.html' });
@@ -71,6 +79,50 @@ const loginUser = async (req, res) => {
         res.status(500).json({ message: 'Error logging in', error });
     }
 };
+
+const verify2FA = async (req, res) => {
+    try {
+        const { securityQuestion, securityAnswer } = req.body;
+
+        if (!securityQuestion || !securityAnswer) {
+            return res.status(400).json({ message: "Security question and answer are required." });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Save 2FA settings
+        user.is2FAEnabled = true;
+        user.securityQuestion = securityQuestion;
+        user.securityAnswer = securityAnswer;
+        await user.save();
+
+        res.json({ message: "2FA enabled successfully!" });
+    } catch (error) {
+        console.error("Error enabling 2FA:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+const updateTwoFA = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.is2FAEnabled = req.body.is2FAEnabled;
+
+        if (!user.is2FAEnabled) {
+            user.securityAnswer = undefined; // Clear security answer if disabling 2FA
+        }
+
+        await user.save();
+        res.json({ message: "2FA updated successfully", is2FAEnabled: user.is2FAEnabled });
+    } catch (error) {
+        console.error("Error updating 2FA:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
 
 
 const resetPassword = async (req, res) => {
@@ -93,20 +145,16 @@ const resetPassword = async (req, res) => {
     }
 };
 
-const updateUserProfile = async (req, res) => {
+const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).select("-password -securityAnswer"); // Don't send password or security answer
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        user.name = req.body.name || user.name;
-        user.email = req.body.email || user.email;
-
-        await user.save();
-        res.json({ message: "Profile updated successfully", user });
+        res.json(user);
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching profile:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
 
-module.exports = { registerUser, loginUser, resetPassword , updateUserProfile};
+module.exports = { registerUser, loginUser, resetPassword , getUserProfile , verify2FA , updateTwoFA};
