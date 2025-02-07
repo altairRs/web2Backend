@@ -104,13 +104,20 @@ function updateCategoryProgress(tasks) {
 
 // Save task (Modified to handle both new and updated tasks)
 saveTaskButton.addEventListener('click', async () => {
+    // THESE ARE THE CRITICAL LOGS:
+    console.log("saveTaskButton clicked!");
+    console.log("taskTitleInput.value:", taskTitleInput.value);
+    console.log("taskCategorySelect.value:", taskCategorySelect.value);
+
     const taskData = {
         title: taskTitleInput.value,
         category: taskCategorySelect.value,
-        status: currentTask ? currentTask.dataset.status : 'pending', // Use existing status if editing
+        status: currentTask ? currentTask.dataset.status : 'pending',
+        dueDate: null, // Include if you have a dueDate input
+        assignedTo: null, // Include if you have an assignedTo input
     };
 
-    const method = currentTask ? 'PUT' : 'POST'; // Determine if it's an update or a new task
+    const method = currentTask ? 'PUT' : 'POST';
     const url = currentTask ? `/api/tasks/${currentTask.dataset.id}` : '/api/tasks';
 
     try {
@@ -124,35 +131,44 @@ saveTaskButton.addEventListener('click', async () => {
 
         if (!response.ok) {
             console.error('Server response:', data);
+            if (data.errors) {
+                alert(`Validation Errors:\n${data.errors.join('\n')}`);
+            } else {
+                alert(`Failed to ${currentTask ? 'update' : 'add'} task: ${data.message}`);
+            }
             throw new Error(`Failed to ${currentTask ? 'update' : 'save'} task`);
         }
 
-        // Update or add task to the UI
-        if (currentTask) {
+        // ... (rest of your success handling) ...
+         if (currentTask) {
             // Update existing task
             currentTask.querySelector('p').innerText = data.title;
             currentTask.dataset.category = data.category;
-        } else {
+         }  else {
             // Add new task
             const taskDiv = document.createElement('div');
             taskDiv.classList.add('task');
-            taskDiv.draggable = true; // Make it draggable
-            taskDiv.dataset.id = data.task._id; // Store the task ID
+            taskDiv.draggable = true;
+            taskDiv.dataset.id = data.task._id;
             taskDiv.dataset.category = data.task.category;
             taskDiv.dataset.status = data.task.status;
             taskDiv.innerHTML = `
                 <span class="task-label">${data.task.category}</span>
                 <p>${data.task.title}</p>
-            `;
-            addDragListeners(taskDiv); // Add drag-and-drop listeners
-            document.querySelector(`[data-status="pending"]`).appendChild(taskDiv);
-        }
+                <button class="delete-btn" data-id="${data.task._id}">Delete</button>
+                `;
+                addDragListeners(taskDiv);
+                const deleteButton = taskDiv.querySelector('.delete-btn');
+                deleteButton.addEventListener('click', handleDeleteTask);
+                document.querySelector(`[data-status="pending"]`).appendChild(taskDiv);
+         }
+            taskModal.classList.remove('show');
+            await loadTasks();
 
-        taskModal.classList.remove('show');
-        await loadTasks(); // Reload tasks to ensure consistency and update progress
+
     } catch (error) {
         console.error('Error:', error.message);
-        alert(`Failed to ${currentTask ? 'update' : 'add'} task. Please try again.`);
+        // alert is already handled above
     }
 });
 
@@ -362,3 +378,13 @@ function logout() {
         })
         .catch(error => console.error("Logout failed:", error));
 }});
+
+document.getElementById('toggle-progress-btn').addEventListener('click', function () {
+    const progressContainer = document.getElementById('task-progress');
+    progressContainer.classList.toggle('hidden');
+});
+
+document.getElementById('toggle-pomodoro-btn').addEventListener('click', function () {
+    const pomodoroContainer = document.getElementById('pomodoro-container');
+    pomodoroContainer.classList.toggle('hidden');
+});
