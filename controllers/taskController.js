@@ -2,16 +2,12 @@
 const Task = require('../models/task');
 
 const getAllTasks = async (req, res) => {
-  console.log('Fetching tasks...');
   try {
     const tasks = await Task.find();
-    console.log('Tasks found:', tasks); // Add this line
     res.status(200).json(tasks);
   } catch (error) {
-    console.error('Error fetching tasks:', error); // Log the error
     res.status(500).json({ message: 'Error fetching tasks', error });
   }
-  
 };
 
 const createTask = async (req, res) => {
@@ -34,6 +30,7 @@ const createTask = async (req, res) => {
   }
 };
 
+// Only one updateTask function is needed
 const updateTask = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
@@ -51,8 +48,8 @@ const updateTask = async (req, res) => {
 
       res.status(200).json(updatedTask);
   } catch (error) {
-      console.error("Error updating task:", error);
-      res.status(500).json({ message: "Error updating task", error });
+    console.error("Error updating task:", error);
+    res.status(500).json({ message: "Error updating task", error: error.message }); // Send error.message
   }
 };
 
@@ -72,29 +69,8 @@ const deleteTask = async (req, res) => {
   }
 };
 
-const saveAllTasks = async (req, res) => {
-  const { tasks } = req.body;
-  const userId = req.user.id; // Ensure user authentication
+// saveAllTasks is no longer needed for basic drag-and-drop
+// It could be useful for bulk updates, but that's a separate feature.
+// const saveAllTasks = async (req, res) => { ... };
 
-  try {
-      const updatePromises = tasks.map(task =>
-          Task.findByIdAndUpdate(task.id, { status: task.status, savedBy: userId }, { new: true })
-      );
-
-      const updatedTasks = await Promise.all(updatePromises);
-      res.status(200).json({ message: 'Tasks updated successfully', updatedTasks });
-  } catch (error) {
-      console.error('Error saving tasks:', error);
-      res.status(500).json({ message: 'Error saving tasks', error });
-  }
-};
-
-exports.updateTask = (req, res) => {
-  // Update task logic here
-  res.send('Task updated');
-};
-
-
-
-module.exports = { getAllTasks, createTask, updateTask, deleteTask, saveAllTasks };
-
+module.exports = { getAllTasks, createTask, updateTask, deleteTask };

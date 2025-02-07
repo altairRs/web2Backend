@@ -1,47 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const Task = require('../models/task'); // Ensure Task model is imported
-const { getAllTasks } = require('../controllers/taskController');
-const { taskSchema } = require('../validators/taskValidator');
+const Task = require('../models/task');
+const { getAllTasks, createTask, updateTask, deleteTask } = require('../controllers/taskController'); // Import all controller functions
+//const { taskSchema } = require('../validators/taskValidator'); // You don't need validation for GET/PUT/DELETE
 
 // Fetch all tasks
 router.get('/', getAllTasks);
 
 // Create a new task
-router.post('/', async (req, res) => {
-    try {
-        console.log('Request body:', req.body); // Log the request body
+router.post('/', createTask);
 
-        const { error } = taskSchema.validate(req.body);
-        if (error) {
-            console.error('Validation error:', error.details[0].message);
-            return res.status(400).json({ message: error.details[0].message });
-        }
+// Update a task by ID
+router.put('/:id', updateTask);
 
-        const { title, category, status, createdAt } = req.body;
-
-        // Create and save the task
-        const task = new Task({ title, category, status, createdAt });
-        await task.save();
-
-        res.status(201).json(task);
-    } catch (error) {
-        console.error('Error saving task:', error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-
-// Fetch all tasks
-router.get('/', async (req, res) => {
-    try {
-        const tasks = await Task.find(); // Fetch all tasks
-        res.status(200).json(tasks);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-
+// Delete a task by ID
+router.delete('/:id', deleteTask);
 
 module.exports = router;
