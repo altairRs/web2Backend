@@ -177,16 +177,21 @@ async function loadTasks() {
         tasks.forEach(task => {
             const taskDiv = document.createElement('div');
             taskDiv.classList.add('task');
-            taskDiv.draggable = true; // Make it draggable
-            taskDiv.dataset.id = task._id; // Store the task ID
+            taskDiv.draggable = true;
+            taskDiv.dataset.id = task._id;
             taskDiv.dataset.category = task.category;
             taskDiv.dataset.status = task.status;
             taskDiv.innerHTML = `
                 <span class="task-label">${task.category}</span>
                 <p>${task.title}</p>
+                <button class="delete-btn" data-id="${task._id}">Delete</button> <!-- Add delete button -->
             `;
 
-            addDragListeners(taskDiv); // Add drag-and-drop listeners
+            addDragListeners(taskDiv);
+
+            // Add event listener for the delete button
+            const deleteButton = taskDiv.querySelector('.delete-btn');
+            deleteButton.addEventListener('click', handleDeleteTask);
 
             const column = document.querySelector(`[data-status="${task.status}"]`);
             if (column) column.appendChild(taskDiv);
@@ -199,6 +204,47 @@ async function loadTasks() {
         alert('Failed to load tasks. Please try again.');
     }
 }
+
+// Event handler for deleting a task
+async function handleDeleteTask(event) {
+    event.stopPropagation(); // Prevent triggering other click events (like opening the modal)
+    const taskId = event.target.dataset.id;
+
+    if (!taskId || !/^[0-9a-fA-F]{24}$/.test(taskId)) {
+        console.error("Invalid task ID for deletion:", taskId);
+        alert("Failed to delete task. Invalid task ID.");
+        return;
+    }
+
+    // Confirmation dialog
+    if (!confirm('Are you sure you want to delete this task?')) {
+        return; // Do nothing if the user cancels
+    }
+
+    try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Server error:", errorData);
+            throw new Error(`Failed to delete task. Server responded with ${response.status}`);
+        }
+
+        // Remove the task from the UI
+        const taskElement = document.querySelector(`[data-id="${taskId}"]`);
+        if (taskElement) {
+            taskElement.remove();
+        }
+
+        await loadTasks(); // Reload tasks to update progress and UI
+    } catch (error) {
+        console.error('Error deleting task:', error.message);
+        alert('Failed to delete task. Please try again.');
+    }
+}
+
 
 // Add drag-and-drop event listeners to a task element
 function addDragListeners(taskDiv) {
