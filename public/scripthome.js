@@ -81,6 +81,27 @@ function updateOverallProgress(tasks) {
     overallProgressBar.setAttribute('aria-valuenow', overallProgress);
 }
 
+// Update category progress
+
+function updateCategoryProgress(tasks) {
+    const categories = ['Copywriting', 'Illustration', 'UI Design']; // Define your categories
+
+    categories.forEach(category => {
+        const categoryTasks = tasks.filter(task => task.category === category);
+        const totalCategoryTasks = categoryTasks.length;
+        const completedCategoryTasks = categoryTasks.filter(task => task.status === 'completed').length;
+        const categoryProgress = totalCategoryTasks > 0 ? (completedCategoryTasks / totalCategoryTasks) * 100 : 0;
+
+        // Find the progress bar element for this category.  We'll use a naming convention.
+        const progressBarElement = document.querySelector(`.progress-bar[data-category="${category}"]`);
+
+        if (progressBarElement) {
+            progressBarElement.style.width = `${categoryProgress}%`;
+            progressBarElement.setAttribute('aria-valuenow', categoryProgress);
+        }
+    });
+}
+
 // Save task (Modified to handle both new and updated tasks)
 saveTaskButton.addEventListener('click', async () => {
     const taskData = {
@@ -172,6 +193,7 @@ async function loadTasks() {
         });
 
         updateOverallProgress(tasks);
+        updateCategoryProgress(tasks);
     } catch (error) {
         console.error('Error loading tasks:', error.message);
         alert('Failed to load tasks. Please try again.');
