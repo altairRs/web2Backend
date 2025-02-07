@@ -16,27 +16,23 @@ const app = express();
 // Middleware
 app.use(bodyParser.json()); // Parses incoming JSON requests
 
-// Error Handling Middleware
-app.use(errorHandler);
-
-// Middleware
-
+// Error Handling Middleware - Correct Placement
 app.use(express.json()); // Parses incoming JSON requests
 app.use(cookieParser()); // Enable cookie parsing
-
-app.use('/api/tasks', taskRoutes); // Use task routes for the '/api/tasks' endpoint
-
 app.use(express.urlencoded({ extended: true }));
+
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Import and use routes
-
 app.use('/api/users', userRoutes);
-app.use("/api", userRoutes);
+app.use("/api", userRoutes);  // This line seems redundant with the previous one
+app.use('/api/tasks', taskRoutes); // Use task routes for the '/api/tasks' endpoint
 
-// Fallback route to serve the home.html for any other requests
+
+
+// Fallback route to serve the login.html, not home.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -132,6 +128,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the User Management API');
 });
 
+app.use(errorHandler); // Correct Placement - AFTER all routes
 
 // Start the server
 const PORT = 3000;
