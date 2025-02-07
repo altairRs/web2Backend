@@ -80,6 +80,43 @@ const loginUser = async (req, res) => {
     }
 };
 
+const verify2FALogin = async (req, res) => {
+    try {
+        const { tempUserId, securityAnswer } = req.body;
+
+        if (!tempUserId || !securityAnswer) {
+            return res.status(400).json({ message: "Invalid request. Missing parameters." });
+        }
+
+        const user = await User.findById(tempUserId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Compare hashed security answer
+        const isAnswerValid = await bcrypt.compare(securityAnswer, user.securityAnswer);
+        if (!isAnswerValid) {
+            return res.status(400).json({ message: "Incorrect security answer" });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.cookie("auth_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 3600000 // 1 hour
+        });
+
+        res.status(200).json({ message: "2FA verification successful", redirect: "/home.html" });
+    } catch (error) {
+        console.error("Error verifying 2FA:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 const verify2FA = async (req, res) => {
     try {
         const { securityQuestion, securityAnswer } = req.body;
@@ -91,10 +128,12 @@ const verify2FA = async (req, res) => {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // Save 2FA settings
+        // Hash security answer before saving
+        const hashedAnswer = await bcrypt.hash(securityAnswer, 10);
+
         user.is2FAEnabled = true;
         user.securityQuestion = securityQuestion;
-        user.securityAnswer = securityAnswer;
+        user.securityAnswer = hashedAnswer;
         await user.save();
 
         res.json({ message: "2FA enabled successfully!" });
@@ -103,6 +142,7 @@ const verify2FA = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
 const updateTwoFA = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -111,7 +151,8 @@ const updateTwoFA = async (req, res) => {
         user.is2FAEnabled = req.body.is2FAEnabled;
 
         if (!user.is2FAEnabled) {
-            user.securityAnswer = undefined; // Clear security answer if disabling 2FA
+            user.securityQuestion = undefined;
+            user.securityAnswer = undefined; // Ensure both fields are cleared
         }
 
         await user.save();
@@ -121,8 +162,6 @@ const updateTwoFA = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-
-
 
 
 const resetPassword = async (req, res) => {
@@ -147,14 +186,15 @@ const resetPassword = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-password -securityAnswer"); // Don't send password or security answer
+        const user = await User.findById(req.user.id).select("-password");
         if (!user) return res.status(404).json({ message: "User not found" });
 
         res.json(user);
     } catch (error) {
-        console.error("Error fetching profile:", error);
-        res.status(500).json({ message: "Server error" });
+        console.error("Error fetching user profile:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
-module.exports = { registerUser, loginUser, resetPassword , getUserProfile , verify2FA , updateTwoFA};
+
+module.exports = { registerUser, loginUser, resetPassword , getUserProfile , verify2FA , updateTwoFA,verify2FALogin};

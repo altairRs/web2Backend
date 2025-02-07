@@ -7,7 +7,7 @@ const path = require("path");  // Ensure path module is also imported
 
 
 
-const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA} = require('../controllers/userControllers.js');
+const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA , verify2FALogin} = require('../controllers/userControllers.js');
 const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
@@ -31,11 +31,17 @@ router.post("/auth/logout", (req, res) => {
 });
 
 
-router.post("/verify-2fa", verify2FA)
+router.post('/verify-2fa', verify2FALogin);
+
+// Enable or update 2FA settings
+router.post('/enable-2fa', authMiddleware, verify2FA);
+router.put('/update-2fa', authMiddleware, updateTwoFA)
 
 router.get('/profile', authMiddleware, getUserProfile);
 
-router.post('/update-2fa', authMiddleware, updateTwoFA);
+
+
+
 
 router.get('/user', authMiddleware, async (req, res) => {
     try {

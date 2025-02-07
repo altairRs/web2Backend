@@ -6,6 +6,7 @@
     <title>Task Management</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="stylehome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -33,7 +34,11 @@
                     <h4>Done</h4>
                 </div>
             </div>
-            <div class="sidebar">
+            <div id="task-progress-div">
+            <div class="task-progress-container" id="task-progress">
+                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">
+                    <i class="fa fa-tasks" style="color: white;"></i>
+                </button>
                 <h4>Task Progress</h4>
                 <div class="mb-3">
                     <span>Copywriting</span>
@@ -59,8 +64,12 @@
                         <div class="progress-bar bg-info" id="overall-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
-                <div class="pomodoro-container">
-                    <h1>Pomodoro Timer</h1>
+            </div>
+                <div class="pomodoro-container" id="pomodoro-container">
+                    <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">
+                        <i class="fa fa-clock" style="color: white;"></i>
+                    </button>
+                    <h4>Pomodoro Timer</h4>
                     <div id="timer">25:00</div>
                     <button class="start" onclick="startTimer()">Start</button>
                     <button class="stop" onclick="stopTimer()">Stop</button>
@@ -93,8 +102,6 @@
             <button id="saveTask" class="btn btn-primary">Save</button>
         </div>
     </div>
-
-    <button onclick="logout()">Logout</button>
 
     <script src="scripthome.js"></script>
 </body>
