@@ -37,3 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error checking authentication:", error);
     }
 });
+
+if (window.location.pathname.endsWith(".html")) {
+    window.history.replaceState(null, "", window.location.pathname.replace(".html", ""));
+}

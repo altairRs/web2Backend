@@ -19,23 +19,36 @@
     </div>
 
     <script>
-        document.getElementById("verify-2fa-form").addEventListener("submit", async function(e) {
+        document.getElementById("verify-2fa-form").addEventListener("submit", async function (e) {
             e.preventDefault();
-            const securityAnswer = document.getElementById("security-answer").value;
+            const verificationCode = document.getElementById("security-answer").value.trim();
 
-            const response = await fetch("/user/verify-2fa", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ securityAnswer })
-            });
+            console.log("Submitting 2FA code:", verificationCode);
 
-            const result = await response.json();
-            if (result.redirect) {
-                window.location.href = result.redirect;
-            } else {
-                alert(result.message);
+            try {
+                const response = await fetch("/user/verify-2fa", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: verificationCode }),
+                    credentials: "include"  // ✅ Ensure cookies are sent
+                });
+
+                console.log("Response status:", response.status);
+
+                const result = await response.json();
+                console.log("Server response:", result);
+
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error("Error verifying 2FA:", error);
+                alert("Error verifying 2FA. Please try again.");
             }
         });
+
     </script>
 </body>
 </html>

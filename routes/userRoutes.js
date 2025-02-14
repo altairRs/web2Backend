@@ -7,7 +7,7 @@ const path = require("path");  // Ensure path module is also imported
 
 
 
-const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA , verify2FALogin} = require('../controllers/userControllers.js');
+const { registerUser, loginUser, getUser, resetPassword, verify2FA, getUserProfile,  updateTwoFA , disable2FA , enable2FA} = require('../controllers/userControllers.js');
 const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
@@ -31,17 +31,33 @@ router.post("/auth/logout", (req, res) => {
 });
 
 
-router.post('/verify-2fa', verify2FALogin);
+router.post('/verify-2fa', verify2FA);
 
-// Enable or update 2FA settings
-router.post('/enable-2fa', authMiddleware, verify2FA);
-router.put('/update-2fa', authMiddleware, updateTwoFA)
 
 router.get('/profile', authMiddleware, getUserProfile);
 
+router.get("/get-profile", authMiddleware, getUserProfile);
 
 
+router.post('/update-2fa', authMiddleware, updateTwoFA);
 
+router.post("/enable-2fa", authMiddleware, enable2FA); // Enable 2FA
+router.post("/disable-2fa", authMiddleware, disable2FA); // Disable 2FA
+
+// ✅ Get 2FA Status (Check if enabled)
+router.get("/2fa-status", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json({ is2FAEnabled: user.is2FAEnabled });
+    } catch (error) {
+        console.error("Error fetching 2FA status:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 router.get('/user', authMiddleware, async (req, res) => {
     try {

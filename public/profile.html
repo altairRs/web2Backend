@@ -53,6 +53,14 @@
             font-size: 20px;
             margin-bottom: 15px;
         }
+
+        input {
+            margin-bottom: 20px;
+        }
+
+        input#profile-picture {
+            padding-bottom: 20px !important;
+        }
     </style>
 </head>
 
@@ -69,8 +77,11 @@
         <div class="profile-section">
             <h2>Two-Factor Authentication (2FA)</h2>
             <p id="twoFAStatus">Checking...</p>
-            <button id="toggle2FA" class="btn btn-primary">Enable 2FA</button>
+            <button id="toggle2FA" class="btn btn-success">Enable 2FA</button>
+            <button id="disabling2FA" class="btn btn-danger">Disable 2FA</button>
         </div>
+        
+        
 
         <div class="profile-section">
             <h2>Change Password</h2>
@@ -96,15 +107,19 @@
         <div class="profile-section">
             <h2>Contact</h2>
             <div class="social-icons">
-                <a href="#" target="_blank" id="githubLink" title="GitHub"><i class="fab fa-github fa-lg"></i></a>
+                <a href="https://github.com/Aweary69" target="_blank" id="githubLink" title="GitHub">
+                    <i class="fab fa-github fa-lg"></i>
+                </a>
+                <a href="home.html" id="homeLink" title="Home">
+                    <i class="fas fa-home fa-lg"></i>
+                </a>
             </div>
         </div>
+        
 
-        <button onclick="logout()">Logout</button>
+        <button onclick="logout()" class="btn btn-primary" style="margin-top: 20px;">Logout</button>
+        
     </div>
-
-    
-
     <script src="scriptprofile.js">
     </script>
 </body>

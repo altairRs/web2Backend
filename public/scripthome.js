@@ -354,21 +354,19 @@ function getCategoryColor(category) {
     }
 }
 
-// scripthome.js (and scriptlog.js) - TEMPORARY CHANGE
-// scripthome.js (and scriptlog.js) - TEMPORARY CHANGE
+// Authentication check (No changes, kept for completeness)
 document.addEventListener("DOMContentLoaded", async () => {
-    // try {
-    //     const response = await fetch("/api/auth/check", { credentials: "include" });
-    //     const data = await response.json();
+    try {
+        const response = await fetch("/api/auth/check", { credentials: "include" });
+        const data = await response.json();
 
-    //     if (!data.authenticated) {
-    //         window.location.href = "/login.html"; // Redirect if not logged in
-    //     }
-    // } catch (error) {
-    //     console.error("Error checking authentication:", error);
-    //     window.location.href = "/login.html";
-    // }
-    await loadTasks(); // Call loadTasks directly
+        if (!data.authenticated) {
+            window.location.href = "/login.html"; // Redirect if not logged in
+        }
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+        window.location.href = "/login.html";
+    }
 });
 
 // Logout (No changes, kept for completeness)

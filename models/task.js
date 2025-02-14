@@ -27,7 +27,7 @@ const taskSchema = new mongoose.Schema({
     },
     dueDate: { // Add dueDate
         type: Date,
-        required: false // Make it optional for now
+        required: false // Make it optional for now; you can make it required later
     },
     assignedTo: { // Add assignedTo
         type: String,
@@ -37,7 +37,7 @@ const taskSchema = new mongoose.Schema({
     createdBy: {  // Add createdBy with reference to User
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User', // IMPORTANT: This assumes you have a User model.
-      required: false // Set to false for easier testing
+      required: false // Set to false for easier testing without full auth
     },
     createdAt: {
         type: Date,

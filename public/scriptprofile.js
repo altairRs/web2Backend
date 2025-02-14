@@ -1,101 +1,78 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const twoFAForm = document.getElementById("2fa-form");
-    const toggle2FAButton = document.getElementById("toggle2FA");
-    const securitySection = document.getElementById("security-question-section");
+    const enable2FAButton = document.getElementById("toggle2FA");
+    const disable2FAButton = document.getElementById("disabling2FA");
     const twoFAStatus = document.getElementById("twoFAStatus");
 
-    try {
-        const response = await fetch("/api/user/profile", { credentials: "include" });
+    // Fetch current 2FA status
+    async function fetch2FAStatus() {
+        try {
+            const response = await fetch("/api/user/profile", { credentials: "include" });
+            const user = await response.json();
 
-        if (!response.ok) {
-            const errorText = await response.text(); // Read error response
-            throw new Error(`Failed to fetch profile: ${errorText}`);
+            if (!response.ok) throw new Error(user.message || "Failed to fetch 2FA status");
+
+            update2FAUI(user.is2FAEnabled);
+        } catch (error) {
+            console.error("Error fetching 2FA status:", error);
         }
-
-        const user = await response.json();
-
-        if (twoFAStatus) {
-            twoFAStatus.innerText = user.is2FAEnabled
-                ? "✅ Two-Factor Authentication is ENABLED"
-                : "❌ Two-Factor Authentication is DISABLED";
-        }
-
-        if (toggle2FAButton) {
-            toggle2FAButton.innerText = user.is2FAEnabled ? "Disable 2FA" : "Enable 2FA";
-            securitySection.style.display = user.is2FAEnabled ? "none" : "block";
-
-            toggle2FAButton.addEventListener("click", async () => {
-                try {
-                    if (user.is2FAEnabled) {
-                        await update2FA(false);
-                    } else {
-                        securitySection.style.display = "block"; // Show security question form
-                    }
-                } catch (error) {
-                    console.error("Error updating 2FA:", error);
-                    alert(error.message);
-                }
-            });
-        }
-
-        if (twoFAForm) {
-            twoFAForm.addEventListener("submit", async (event) => {
-                event.preventDefault();
-                await enable2FA();
-            });
-        }
-
-    } catch (error) {
-        console.error("Error loading profile:", error);
     }
+
+    // Update UI based on 2FA status
+    function update2FAUI(is2FAEnabled) {
+        twoFAStatus.innerText = is2FAEnabled
+            ? "✅ Two-Factor Authentication is ENABLED"
+            : "❌ Two-Factor Authentication is DISABLED";
+
+        enable2FAButton.style.display = is2FAEnabled ? "none" : "inline-block";
+        disable2FAButton.style.display = is2FAEnabled ? "inline-block" : "none";
+    }
+
+    // Enable 2FA
+    enable2FAButton.addEventListener("click", async () => {
+        try {
+            const response = await fetch("/api/enable-2fa", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to enable 2FA");
+
+            alert("✅ 2FA has been enabled.");
+            location.reload(); // 🔄 Refresh the page to apply changes
+        } catch (error) {
+            console.error("Error enabling 2FA:", error);
+            alert(error.message);
+        }
+    });
+
+    // Disable 2FA
+    disable2FAButton.addEventListener("click", async () => {
+        try {
+            const response = await fetch("/api/disable-2fa", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to disable 2FA");
+
+            alert("❌ 2FA has been disabled.");
+            location.reload(); // 🔄 Refresh the page to apply changes
+        } catch (error) {
+            console.error("Error disabling 2FA:", error);
+            alert(error.message);
+        }
+    });
+
+    await fetch2FAStatus();
 });
 
-/** Function to enable 2FA */
-async function enable2FA() {
-    const securityQuestion = document.getElementById("security-question").value;
-    const securityAnswer = document.getElementById("security-answer").value;
-
-    try {
-        const response = await fetch("/enable-2fa", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ securityQuestion, securityAnswer }),
-            credentials: "include",
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Failed to enable 2FA");
-
-        alert("✅ 2FA enabled successfully!");
-        location.reload();
-    } catch (error) {
-        console.error("Error enabling 2FA:", error);
-        alert(error.message);
-    }
-}
-
-/** Function to disable 2FA */
-async function update2FA(isEnabled) {
-    try {
-        const response = await fetch("/update-2fa", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ is2FAEnabled: isEnabled }),
-            credentials: "include",
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Failed to update 2FA");
-
-        alert(isEnabled ? "✅ 2FA enabled successfully!" : "❌ 2FA disabled successfully!");
-        location.reload();
-    } catch (error) {
-        console.error("Error updating 2FA:", error);
-        alert(error.message);
-    }
-}
 
 
+        
 
 
 async function fetchUserData() {
@@ -186,18 +163,19 @@ async function fetchUserProfile() {
 
         // Read response as text first
         const textResponse = await response.text();
-        console.log("Raw Response from Server:", textResponse);
 
-        // Try parsing JSON only if it's valid
-        try {
-            const user = JSON.parse(textResponse);
-            if (response.ok) {
-                document.getElementById("profile-img").src = user.profilePicture || "profile-placeholder.png";
-            } else {
-                console.error("Error fetching profile:", user.message);
-            }
-        } catch (jsonError) {
-            console.error("Failed to parse JSON. Server returned HTML instead:", jsonError);
+
+        // Try parsing JSON only if the response is not HTML
+        if (textResponse.startsWith("<!DOCTYPE html")) {
+            throw new Error("Server returned an HTML page instead of JSON. Check your backend.");
+        }
+
+        const user = JSON.parse(textResponse);
+
+        if (response.ok) {
+            document.getElementById("profile-img").src = user.profilePicture || "profile-placeholder.png";
+        } else {
+            console.error("Error fetching profile:", user.message);
         }
     } catch (error) {
         console.error("Error loading profile:", error);
@@ -205,6 +183,13 @@ async function fetchUserProfile() {
 }
 
 
+// Call function when page loads
+document.addEventListener("DOMContentLoaded", fetchUserProfile);
+
+
+if (window.location.pathname.endsWith(".html")) {
+    window.history.replaceState(null, "", window.location.pathname.replace(".html", ""));
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -228,7 +213,8 @@ function logout() {
             window.location.href = data.redirect; // Redirect to login
         })
         .catch(error => console.error("Logout failed:", error));
-}
+};  
+
 
 
 

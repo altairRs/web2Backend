@@ -18,3 +18,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         alert(result.message || 'An error occurred');
     }
 });
+
+
+if (window.location.pathname.endsWith(".html")) {
+    window.history.replaceState(null, "", window.location.pathname.replace(".html", ""));
+}

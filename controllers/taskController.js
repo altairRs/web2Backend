@@ -11,19 +11,31 @@ const getAllTasks = async (req, res) => {
   }
 };
 
-// controllers/taskController.js (createTask - TEMPORARY FIX)
 const createTask = async (req, res) => {
-  // ...
-  try {
-    const newTask = new Task({
-      // ...
-      //createdBy: req.user.id, // TEMPORARILY COMMENT THIS OUT
-      createdBy: "some_user_id" // Or use a hardcoded ID
-    });
-    // ...
-  } catch (error) {
-    // ...
-  }
+    const { title, status, category, dueDate, assignedTo } = req.body;
+
+    try {
+        const newTask = new Task({
+            title,
+            status,
+            category,
+            dueDate, // Now handled correctly
+            assignedTo, // Now handled correctly
+            createdBy: req.user ? req.user.id : null, // Graceful handling if req.user is not available
+        });
+
+        await newTask.save();
+        res.status(201).json({ message: 'Task created successfully', task: newTask });
+    } catch (error) {
+        console.error("Error creating task:", error); //  Log the ENTIRE error object
+
+        // Check for validation errors
+        if (error.name === 'ValidationError') {
+          const messages = Object.values(error.errors).map(val => val.message);
+          return res.status(400).json({ message: 'Validation Error', errors: messages });
+        }
+        res.status(500).json({ message: 'Error creating task', error: error.message }); // Send error message
+    }
 };
 
 
@@ -65,8 +77,8 @@ const deleteTask = async (req, res) => {
     }
     res.status(200).json({ message: 'Task deleted successfully' });
   } catch (error) {
-    console.error("Error deleting task:", error);
-    res.status(500).json({ message: 'Error deleting task', error: error.message });
+    console.error("Error deleting task:", error); // Log the full error
+    res.status(500).json({ message: 'Error deleting task', error: error.message }); // Send error message
   }
 };
 

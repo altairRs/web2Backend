@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcryptjs");
+
 
 // Define the User schema
 const userSchema = new mongoose.Schema({
@@ -26,10 +28,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // Default: 2FA is disabled unless the user enables it
   },
-  securityAnswer: {
-    type: String,
-    required: function () { return this.is2FAEnabled; }, // Required only if 2FA is enabled
-  },
   
   createdAt: {
     type: Date,
@@ -42,12 +40,6 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save', async function (next) {
-  if (this.isModified('securityAnswer') && this.securityAnswer) {
-    this.securityAnswer = await bcrypt.hash(this.securityAnswer, 10);
-  }
-  next();
-});
 
 // Create the User model
 const User = mongoose.model('User', userSchema);
