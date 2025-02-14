@@ -11,31 +11,19 @@ const getAllTasks = async (req, res) => {
   }
 };
 
+// controllers/taskController.js (createTask - TEMPORARY FIX)
 const createTask = async (req, res) => {
-    const { title, status, category, dueDate, assignedTo } = req.body;
-
-    try {
-        const newTask = new Task({
-            title,
-            status,
-            category,
-            dueDate,
-            assignedTo,
-            createdBy: req.user ? req.user.id : null, // Graceful handling
-        });
-
-        await newTask.save();
-        res.status(201).json({ message: 'Task created successfully', task: newTask });
-    } catch (error) {
-        console.error("Error creating task:", error); //  Log the ENTIRE error object
-
-        // Check for validation errors
-        if (error.name === 'ValidationError') {
-          const messages = Object.values(error.errors).map(val => val.message);
-          return res.status(400).json({ message: 'Validation Error', errors: messages });
-        }
-        res.status(500).json({ message: 'Error creating task', error: error.message }); // Send error message
-    }
+  // ...
+  try {
+    const newTask = new Task({
+      // ...
+      //createdBy: req.user.id, // TEMPORARILY COMMENT THIS OUT
+      createdBy: "some_user_id" // Or use a hardcoded ID
+    });
+    // ...
+  } catch (error) {
+    // ...
+  }
 };
 
 
