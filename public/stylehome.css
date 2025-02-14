@@ -1,0 +1,277 @@
+body {
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.board {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    width: 100%;
+}
+
+.column {
+    width: 30%;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-progress-container {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    width: 250px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+/* Toggle button for task progress */
+.toggle-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+#toggle-pomodoro-btn {
+    position: absolute;
+    top: 20px;
+    left: -50px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    transition: background-color 0.3s ease;        
+}
+
+/* Toggle button for task container */
+#task-progress .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#task-progress .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#task-progress .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
+
+/* Toggle button for Pomodoro container */
+#pomodoro-container .toggle-btn {
+    background-color: #9381FF; /* Default button color */
+    color: #fff; /* White text color */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#pomodoro-container .toggle-btn:focus {
+    outline: none; /* Remove focus outline */
+    box-shadow: none; /* Remove any box shadow */
+}
+
+#pomodoro-container .toggle-btn:hover {
+    background-color: #3A1772; /* Hover color */
+    color: white; /* White text color on hover */
+}
+
+
+
+
+.hidden {
+    transform: translateX(100%);
+}
+
+.task {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab;
+}
+
+.task-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+}
+
+.task[data-category="UI Design"] .task-label {
+    background-color: #007bff;
+}
+
+.task[data-category="Illustration"] .task-label {
+    background-color: #28a745;
+}
+
+.task[data-category="Copywriting"] .task-label {
+    background-color: #ffc107;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress {
+    height: 20px;
+}
+
+.modal-body {
+    margin-top: 10px;
+}
+
+.pomodoro-container {
+    position: fixed;
+    top: 420px;
+    right: 20px;
+    width: 250px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.pomodoro-container #timer {
+    font-size: 30px;
+    text-align: center;
+    margin: 5px 0;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #000;
+}
+
+.pomodoro-container button {
+    height: 40px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.4s ease;
+}
+
+.pomodoro-container button:active {
+    transform: scale(0.98);
+}
+
+@keyframes rotateGradientStart {
+    0% {
+        background: linear-gradient(135deg, #43cea2, #185a9d);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #43cea2, #185a9d);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
+}
+
+.pomodoro-container .start {
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+    background-size: 200% 200%;
+    color: #fff;
+    width: 100%;
+    transition: background-position 0.2s linear;
+}
+
+.pomodoro-container .start:hover {
+    animation: rotateGradientStart 0.5s linear forwards;
+}
+
+@keyframes rotateGradientStop {
+    0% {
+        background: linear-gradient(135deg, #fc466b, #3f5efb);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #fc466b, #3f5efb);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
+}
+
+.pomodoro-container .stop {
+    background: linear-gradient(135deg, #fc466b, #3f5efb);
+    background-size: 200% 200%;
+    color: #fff;
+    width: 100%;
+    transition: background-position 0.2s linear;
+}
+
+.pomodoro-container .stop:hover {
+    animation: rotateGradientStop 0.5s linear forwards;
+}
+
+@keyframes rotateGradientReset {
+    0% {
+        background: linear-gradient(135deg, #f7971e, #ffd200);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background: linear-gradient(315deg, #f7971e, #ffd200);
+        background-size: 200% 200%;
+        background-position: 100% 50%;
+    }
+}
+
+.pomodoro-container .reset {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    background-size: 200% 200%;
+    color: #fff;
+    width: 100%;
+    transition: background-position 0.2s linear;
+}
+
+.pomodoro-container .reset:hover {
+    animation: rotateGradientReset 0.5s linear forwards;
+}

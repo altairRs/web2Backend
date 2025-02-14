@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylehome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="my-4 d-flex justify-content-between align-items-center">
+            <span style="flex-grow: 1; text-align: center; font-weight: bold;">Homepage Design</span>
+            <a href="profile.html">
+                <button style="font-size: 16px; background-color: white; border: 1px solid #ccc; color: #333; outline: none; 
+                              padding: 12px; border-radius: 50%; transition: transform 0.3s ease; width: 50px; height: 50px;
+                              margin-left: -5px;" 
+                        onmouseover="this.style.transform='scale(1.1)'" 
+                        onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-user" style="font-size: 24px;"></i> <!-- Profile icon -->
+                </button>
+            </a>
+        </h1>
+        <div class="d-flex justify-content-between">
+            <div class="board">
+                <div class="column" data-status="pending">
+                    <h4>Task pending</h4>
+                </div>
+                <div class="column" data-status="in-progress">
+                    <h4>In Progress</h4>
+                </div>
+                <div class="column" data-status="completed">
+                    <h4>Done</h4>
+                </div>
+            </div>
+            <div id="task-progress-div">
+            <div class="task-progress-container" id="task-progress">
+                <button id="toggle-progress-btn" class="btn btn-primary toggle-btn">
+                    <i class="fa fa-tasks" style="color: white;"></i>
+                </button>
+                <h4>Task Progress</h4>
+                <div class="mb-3">
+                    <span>Copywriting</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-category="Copywriting"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>Illustration</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-category="Illustration"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>UI Design</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-category="UI Design"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span>Overall Progress</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" id="overall-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+                <div class="pomodoro-container" id="pomodoro-container">
+                    <button id="toggle-pomodoro-btn" class="btn btn-primary toggle-btn">
+                        <i class="fa fa-clock" style="color: white;"></i>
+                    </button>
+                    <h4>Pomodoro Timer</h4>
+                    <div id="timer">25:00</div>
+                    <button class="start" onclick="startTimer()">Start</button>
+                    <button class="stop" onclick="stopTimer()">Stop</button>
+                    <button class="reset" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="addTaskButton" class="btn btn-success m-3">Add Task</button>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-header">
+            <h5>Edit Task</h5>
+            <button id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="taskTitle">Task Title</label>
+                <input type="text" id="taskTitle" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="taskCategory">Category</label>
+                <select id="taskCategory" class="form-control">
+                    <option value="Copywriting">Copywriting</option>
+                    <option value="Illustration">Illustration</option>
+                    <option value="UI Design">UI Design</option>
+                </select>
+            </div>
+            <button id="saveTask" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+    <script src="scripthome.js"></script>
+</body>
+</html>

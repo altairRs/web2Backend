@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+            border: 2px solid #007bff;
+        }
+
+        .profile-info h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .profile-info p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        .profile-section {
+            margin-top: 30px;
+        }
+
+        .profile-section h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            margin-bottom: 20px;
+        }
+
+        input#profile-picture {
+            padding-bottom: 20px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container profile-container">
+        <div class="profile-header">
+            <img src="profile-placeholder.png" alt="Profile Picture" class="profile-img" id="profile-img">
+            <div class="profile-info">
+                <h1 id="username">Loading...</h1>
+                <p id="userEmail">Loading...</p>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>Two-Factor Authentication (2FA)</h2>
+            <p id="twoFAStatus">Checking...</p>
+            <button id="toggle2FA" class="btn btn-success">Enable 2FA</button>
+            <button id="disabling2FA" class="btn btn-danger">Disable 2FA</button>
+        </div>
+        
+        
+
+        <div class="profile-section">
+            <h2>Change Password</h2>
+            <form id="changePasswordForm">
+                <label for="currentPassword">Current Password:</label>
+                <input type="password" id="currentPassword" class="form-control" required>
+        
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" class="form-control" required>
+        
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+        </div>
+        
+        <div class="profile-section">
+            <h2>Change Profile Picture</h2>
+            <form id="uploadProfilePicForm" enctype="multipart/form-data">
+                <input type="file" id="profilePicture" class="form-control" accept="image/*" required>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+
+        <div class="profile-section">
+            <h2>Contact</h2>
+            <div class="social-icons">
+                <a href="https://github.com/Aweary69" target="_blank" id="githubLink" title="GitHub">
+                    <i class="fab fa-github fa-lg"></i>
+                </a>
+                <a href="home.html" id="homeLink" title="Home">
+                    <i class="fas fa-home fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        
+
+        <button onclick="logout()" class="btn btn-primary" style="margin-top: 20px;">Logout</button>
+        
+    </div>
+    <script src="scriptprofile.js">
+    </script>
+</body>
+</html>

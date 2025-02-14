@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify 2FA</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Two-Factor Authentication</h2>
+        <p>Please answer your security question to verify your login.</p>
+        <form id="verify-2fa-form">
+            <label for="security-answer">Security Answer:</label>
+            <input type="text" id="security-answer" class="form-control" required>
+            <br>
+            <button type="submit" class="btn btn-primary">Verify</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("verify-2fa-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const verificationCode = document.getElementById("security-answer").value.trim();
+
+            console.log("Submitting 2FA code:", verificationCode);
+
+            try {
+                const response = await fetch("/user/verify-2fa", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: verificationCode }),
+                    credentials: "include"  // ✅ Ensure cookies are sent
+                });
+
+                console.log("Response status:", response.status);
+
+                const result = await response.json();
+                console.log("Server response:", result);
+
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error("Error verifying 2FA:", error);
+                alert("Error verifying 2FA. Please try again.");
+            }
+        });
+
+    </script>
+</body>
+</html>
